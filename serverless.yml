@@ -1,10 +1,6 @@
 service: sentiment
 frameworkVersion: '2'
 
-custom:
-  pythonRequirements:
-    dockerizePip: false
-
 provider:
   name: aws
   runtime: python3.8
