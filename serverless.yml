@@ -3,7 +3,7 @@ frameworkVersion: '2'
 
 custom:
   pythonRequirements:
-    dockerizePip: false
+    dockerizePip: true
 
 provider:
   name: aws
