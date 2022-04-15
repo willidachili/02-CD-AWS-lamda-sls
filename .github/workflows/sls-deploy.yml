@@ -18,5 +18,5 @@ jobs:
         uses: serverless/github-action@v3
         with:
           args: -c "serverless plugin install --name serverless-vpc-discovery serverless-python-requirements && serverless deploy"
-      
+
 
