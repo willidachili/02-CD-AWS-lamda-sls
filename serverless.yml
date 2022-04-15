@@ -1,0 +1,27 @@
+service: sentiment
+frameworkVersion: '3'
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  iam:
+    role:
+      name: sentiment-analysis-role
+      statements:
+        - Effect: 'Allow'
+          Resource: '*'
+          Action: 'comprehend:*'
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: post
+plugins:
+  - serverless-python-requirements
