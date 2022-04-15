@@ -18,6 +18,5 @@ jobs:
           SLS_DEBUG: 1
         uses: serverless/github-action@v2
         with:
-          args: -c "serverless plugin install --name serverless-python-requirements && serverless deploy"
-          entrypoint: /bin/sh
+          args: deploy
 

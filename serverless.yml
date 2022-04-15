@@ -12,6 +12,9 @@ provider:
           Resource: '*'
           Action: 'comprehend:*'
 
+plugins:
+  - serverless-python-requirements
+
 functions:
   hello:
     handler: handler.hello
@@ -19,5 +22,3 @@ functions:
       - httpApi:
           path: /
           method: post
-plugins:
-  - serverless-python-requirements
