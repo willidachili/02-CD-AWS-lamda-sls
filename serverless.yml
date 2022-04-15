@@ -1,9 +1,9 @@
 service: sentiment
-frameworkVersion: '3'
+frameworkVersion: '2'
 
 custom:
   pythonRequirements:
-    dockerizePip: true
+    dockerizePip: false
 
 provider:
   name: aws
