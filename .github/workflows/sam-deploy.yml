@@ -4,6 +4,8 @@ on:
       - main
 jobs:
   build-deploy:
+    env:
+      working-directory: sentiment-demo
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
