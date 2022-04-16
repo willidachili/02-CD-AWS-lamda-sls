@@ -8,6 +8,13 @@ def handler(event, context):
     body = event["body"]
     print ("Sentiment analysis on text", body)
     sentiment = client.detect_sentiment(LanguageCode = "en", Text = body)
-    return json.dumps(sentiment)
 
-
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps({
+            "Region ": json.dumps(sentiment)
+        })
+    }
