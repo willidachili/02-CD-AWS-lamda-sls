@@ -1,7 +1,7 @@
 import json
 import boto3
 
-def handler_main(event, context):
+def handler(event, context):
 
     client = boto3.client('comprehend')
     print("Received event: " + json.dumps(event, indent=2))
