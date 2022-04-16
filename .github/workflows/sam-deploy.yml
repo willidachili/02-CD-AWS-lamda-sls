@@ -2,11 +2,16 @@ on:
   push:
     branches:
       - main
+
+defaults:
+  run:
+    working-directory: ./sentiment-demo
+
 jobs:
   build-deploy:
-    env:
-      working-directory: ./sentiment-demo
     runs-on: ubuntu-latest
+    env:
+      workflow-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
