@@ -8,6 +8,8 @@ Globals:
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
+    Auth:
+      Authorizer: NONE
     Properties:
       CodeUri: lambda/
       Handler: app.handler
@@ -17,9 +19,6 @@ Resources:
         HelloWorld:
           Type: Api
           Properties:
-            Auth:
-              Authorizer:
-                NONE
             Path: /hello
             Method: post
 
