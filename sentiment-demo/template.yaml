@@ -36,6 +36,13 @@ Resources:
               - 'sts:AssumeRole'
       Path: /
       Policies:
+        - PolicyName: default
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 'logs:*'
+                Resource: '*'
         - PolicyName: root
           PolicyDocument:
             Version: "2012-10-17"
