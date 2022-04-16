@@ -18,9 +18,10 @@ Resources:
           Type: Api
           Properties:
             Auth:
-              Authorizer: NONE
+              Authorizer:
+                NONE
             Path: /hello
-            Method: get
+            Method: post
 
   LambdaRole:
     Type: 'AWS::IAM::Role'
