@@ -5,8 +5,12 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  UnleashToken:
+    Type: String
+
 Resources:
-  HelloWorldFunction:
+  SentumentFunction:
     Type: AWS::Serverless::Function
     Auth:
       Authorizer: NONE
@@ -15,6 +19,10 @@ Resources:
       Handler: app.handler
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.8
+      Environment:
+        Variables:
+          UnleashToken: !Ref UnleashToken
+
       Events:
         HelloWorld:
           Type: Api
