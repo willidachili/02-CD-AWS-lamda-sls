@@ -4,6 +4,9 @@ Demo av using Github actions to deploy a Lambda in a Serverless application. I d
 AWS tjenesten "Comprehend" for å finne ut av om "stemningen" (Sentiment) i en tekst er negativt eller positivt 
 ladet. Dette kan for eksempel brukes til å finne ut av om et produkt får god eller dårlig omtale i medier osv. 
 
+Vi skal også se på hvoordan vi kan bruke Feature toggles med Unleash for å slå av/på funkskjonalitet dynamisk 
+uten å gjøre nye deployments. 
+
 ## Log på Cloud 9 miljøet ditt 
 
 ## Lag en fork

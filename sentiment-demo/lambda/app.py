@@ -10,7 +10,7 @@ def handler(event, context):
     client = UnleashClient(
         url="https://eu.app.unleash-hosted.com/eubb1043/api/",
         app_name="sentiment",
-        custom_headers={'Authorization': os.environ['UNLEASH_TOKEN']})
+        custom_headers={'Authorization': os.environ['UnleashToken']})
     client.initialize_client()
     client = boto3.client('comprehend')
 

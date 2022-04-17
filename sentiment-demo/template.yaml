@@ -10,7 +10,7 @@ Parameters:
     Type: String
 
 Resources:
-  SentumentFunction:
+  SentimentFunction:
     Type: AWS::Serverless::Function
     Auth:
       Authorizer: NONE
