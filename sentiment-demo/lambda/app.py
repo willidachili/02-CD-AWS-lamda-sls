@@ -1,5 +1,5 @@
 import json
-import boto
+import boto3
 from UnleashClient import UnleashClient
 
 def handler(event, context):
