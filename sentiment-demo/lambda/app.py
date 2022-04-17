@@ -13,12 +13,13 @@ def handler(event, context):
         app_name="sentiment",
         cache_directory="/tmp/",
         custom_headers={'Authorization': os.environ['UnleashToken']})
-    client.initialize_client()
+    unleash_client.initialize_client()
     client = boto3.client('comprehend')
 
 ## Process sentiment analysis onlyif the MOCK toggle is ON. Mock returns very Positive sentiment just in case
     body = event["body"]
-    if unleash_client.is_enabled("MOCK"):
+    app_context = {"userId": "sam"}
+    if unleash_client.is_enabled("MOCK", app_context):
         sentiment = {
             "Sentiment": "POSITIVE",
             "SentimentScore": {
