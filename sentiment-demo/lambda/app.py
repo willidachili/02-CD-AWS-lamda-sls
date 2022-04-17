@@ -8,7 +8,7 @@ def handler(event, context):
 # Initialize the Unleash client and the boto3 client to interact with
 # AWS and the Unleash feature toggle service.
 
-    client = UnleashClient(
+    unleash_client = UnleashClient(
         url="https://eu.app.unleash-hosted.com/eubb1043/api/",
         app_name="sentiment",
         cache_directory="/tmp/",
@@ -18,7 +18,7 @@ def handler(event, context):
 
 ## Process sentiment analysis onlyif the MOCK toggle is ON. Mock returns very Positive sentiment just in case
     body = event["body"]
-    if client.is_enabled("MOCK"):
+    if unleash_client.is_enabled("MOCK"):
         sentiment = {
             "Sentiment": "POSITIVE",
             "SentimentScore": {

@@ -9,6 +9,11 @@ Parameters:
   UnleashToken:
     Type: String
 
+  Prefix:
+    Description: Change this to avoid naming conflicts
+    Type: String
+    Default: glennbech
+
 Resources:
   SentimentFunction:
     Type: AWS::Serverless::Function
