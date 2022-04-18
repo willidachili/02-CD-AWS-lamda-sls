@@ -1,13 +1,16 @@
 # GitHub actions, AWS Lambda med API Gateway og AWS SAM
 
-I denne øvingen skal vi se på Github actions og hvordan vi kan sette opp en CD pipeline for en AWS Lambdafunksjon. 
+* I denne øvingen skal vi se på Github actions og hvordan vi kan sette opp en CD pipeline for en AWS Lambdafunksjon. 
 Vi skal bruke AWS tjenesten "Comprehend" for å finne "stemningen" (Sentiment) i en tekst- og om den er negativt eller positivt 
 ladet. 
 
-Vi skal også se på hvordan vi kan bruke "Feature toggles" med tjenesten Unleash for å slå av/på funkskjonalitet dynamisk 
+* Vi skal også se på hvordan vi kan bruke "Feature toggles" med tjenesten Unleash for å slå av/på funkskjonalitet dynamisk 
 uten å gjøre nye deployments. 
 
-Deployment og bygg skal gjøres med verktøyet "AWS SAM", både i pipeline med GitHub actions, men også for fra et Cloud9
+* NB! I denne øvingen er det URL til instruktøren sitt miljø i Unleash som er hardkodet inn i filen  ```app.py``` - Unleash sin  
+brukerregistrering er ikke helt synkron, så det kan ta timer(!) fra du registrerer deg til miljøet ditt er klart. I en lab/øving har vi ikke tid til å vente på dette. 
+
+* Deployment og bygg skal gjøres med verktøyet "AWS SAM", både i pipeline med GitHub actions, men også for fra et Cloud9
 miljø.
 
 ## Lag en fork
