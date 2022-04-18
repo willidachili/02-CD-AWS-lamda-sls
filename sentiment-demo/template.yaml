@@ -28,7 +28,7 @@ Resources:
         HelloWorld:
           Type: Api
           Properties:
-            Path: /hello
+            Path: /sentiment
             Method: post
 
   LambdaRole:
@@ -61,11 +61,11 @@ Resources:
                 Resource: '*'
 
 Outputs:
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  SentimentAPI:
+    Description: "API Gateway endpoint URL for Prod stage for Sentiment function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/sentiment/"
   SentimentFunction:
-    Description: "Hello World Lambda Function ARN"
+    Description: "Sentiment Lambda Function ARN"
     Value: !GetAtt SentimentFunction.Arn
   SentimentFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"

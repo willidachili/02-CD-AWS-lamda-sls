@@ -54,6 +54,9 @@ Fra Terminal i Cloud 9. Klone repository med HTTPS URL. Eksempel ;
 git clone https://github.com/≤github bruker>/02-CD-AWS-lamda-sls
 ```
 
+Får du denne feilmeldingen ```bash: /02-CD-AWS-lamda-sls: Permission denied``` - så må du huske å bytte ut <github bruker> med 
+ditt eget Github brukernavn. 
+
 ![Alt text](img/clone.png  "a title")
 
 OBS Når du gjør ```git push``` senere og du skal autentisere deg, skal du bruke GitHub Access token når du blir bedt om passord, 
@@ -66,6 +69,14 @@ antall sekunder på denne måten;
 git config --global credential.helper "cache --timeout=86400"
 ```
 
+Konfigurer også brukernavnet ditt
+
+````shell
+git config --global user.name <github brukernavn>
+git config --global user.email <email for github bruker>
+
+````
+
 ## Test deployment fra Cloud 9
 
 I cloud 9, åpne en Terminal
@@ -74,8 +85,18 @@ I cloud 9, åpne en Terminal
 cd 02-CD-AWS-lamda-sls
 cd sentiment-demo/
 sam build --use-container
-sam invoke local -e event.json 
 ```
+
+Du kan teste funksjonen uten å deploye den til AWS ved å kjøre kommandoen 
+
+```shell
+export UnleashToken=<Token gitt i klasserommet>
+sam local invoke -e event.json 
+```
+Så lenge feature flagget MOCK er satt til "true" vil sentiment-analysen alltid returnere et positivt sentiment. 
+AWS Comprehend tjenesten vil bli brukt, når MOCK feature flagget er slått av. 
+
+Event.json filen inneholder en request, nøyaktig slik API Gateway sender den til "handler" metoden/funksjonen. 
 
 Du skal få en respons omtrent som denne 
 ```
@@ -92,7 +113,7 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
 * NB! Du må endre Stack name til noe unikt. Legg på ditt brukeranvn eller noe i slutten av navnet, for eksempel; ```--stack-name sam-sentiment-ola```
 
 ```shell
- sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=1234"
+ sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-gb3 --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=1234"
 ```
 
 Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
@@ -109,6 +130,9 @@ Men... dette er jo ikke veldig "DevOps" og vil ikke fungere i et større team. V
 effektivt sammen om denne funksjonen.
 
 ## GitHub Actions
+
+* For å få se filer som er "skjulte" i AWS Cloud9 må du velge "show hidden files" i fil-utforskeren.
+![Alt text](img/hiddenfiles.png  "a title")
 
 * Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende.
 * Du må endre parameter ````--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9-
@@ -136,20 +160,49 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: sam build --use-container
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=${{ secrets.UNLEASH_TOKEN }}"
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<your name or something> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=${{ secrets.UNLEASH_TOKEN }}"
  ```
 
+For å pushe endringen til ditt repo må du stå i riktig katalog i Cloud9 terminalen 
+
+```bash
+cd ~/environment/02-CD-AWS-lamda-sls
+git add .github/
+git commit -m"added workflow file" 
+git push 
+```
+
+På git push blir du bedt om brukernavn og passord. Bruk brukernavnet ditt, og Access Token du laget tidligere som passord.
+
 ## Hemmeligheter
+
+![Alt text](img/topsecret.png  "a title")
 
 Vi skal _absolutt ikke_ sjekke inn API nøkler og hemmeligheter inn i koden. GitHub har heldigvis en mekanisme for å lagre hemmeligheter utenfor koden. 
 Repository settings og under menyvalget "secrets" kan vi legge inn verdier og bruke de fra workflowene våre ved å referere de ved navn for eksempel på denne måten
 ``` aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}```
 
+Lag tre repository secrets, verdiene postes på Slack i klasserommet. 
+
+* AWS_ACCESS_KEY_ID 
+* AWS_SECRET_ACCESS_KEY
+* UNLEASH_TOKEN 
+
 ## Sjekk at pipeline virker
 
 * Gjør kode-endringer på main branch i lambda - koden, push. Se at pipeline deployer endringen din 
-* Repetisjon fra tidligere; Endre workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection op main så vi ikke kan pushe direkte til den brnachen.
 
-## Bonus-utfordring 
-Kan dere bruke en Egen Unleash konto og egen feature toggle? 
-Se om dere kan bruke andre 
+* Test lambdafunksjonen med feks Curl (eller Postman om du har) 
+```shell
+curl -X POST \
+  <URL> \
+  -H 'Content-Type: text/plain' \
+  -H 'cache-control: no-cache' \
+  -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
+```
+
+## Bonus utfordringer 
+
+* Kan dere bruke en Egen Unleash konto og egen feature toggle? 
+* Repetisjon fra forrige øving; Klarer du å endre  workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection på ```main``` branch så vi ikke kan pushe direkte dit?.
+ 
