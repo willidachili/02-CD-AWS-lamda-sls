@@ -212,7 +212,9 @@ curl -X POST \
 
 * Kan dere bruke en Egen Unleash konto og egen feature toggle? 
 
-Hint. Se i app.py - og koden 
+Hint. Se i ```app.py```. URL er unik for prosjektet i Unleash, og vil ha en annen verdi for deg om du har en 
+egen Unleash bruker. 
+
 ````python
 unleash_client = UnleashClient(
     url="https://eu.app.unleash-hosted.com/eubb1043/api",
