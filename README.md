@@ -192,9 +192,10 @@ Lag tre repository secrets, verdiene postes på Slack i klasserommet.
 
 ## Sjekk at pipeline virker
 
-* Gjør kode-endringer på main branch i lambda - koden, push. Se at pipeline deployer endringen din.
-
-* Du vil se URL og andre opplysninger om Lambdaen i byggejobben i GitHub Actions
+* Gjør kodeendringer på main branch i Lambdaen
+* Commit & push endringen
+* Se at endringene blir deployet av GitHub Actions workflow.
+* Når jobben er ferdig, vil du se URL og andre opplysninger om Lambdaen i byggejobben i GitHub Actions.
 
 ![Alt text](img/finished.png  "a title")
 
@@ -207,9 +208,17 @@ curl -X POST \
   -H 'cache-control: no-cache' \
   -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
 ```
-
 ## Bonusutfordringer 
 
 * Kan dere bruke en Egen Unleash konto og egen feature toggle? 
+
+Hint. Se i app.py - og koden 
+````python
+unleash_client = UnleashClient(
+    url="https://eu.app.unleash-hosted.com/eubb1043/api",
+    app_name="sentiment",
+    cache_directory="/tmp/",
+    custom_headers={'Authorization': os.environ['UnleashToken']})
+````
+
 * Repetisjon fra forrige øving; Klarer du å endre  workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection på ```main``` branch så vi ikke kan pushe direkte dit?.
- 
