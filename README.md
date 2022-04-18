@@ -54,8 +54,8 @@ Fra Terminal i Cloud 9. Klone repository med HTTPS URL. Eksempel ;
 git clone https://github.com/≤github bruker>/02-CD-AWS-lamda-sls
 ```
 
-Får du denne feilmeldingen ```bash: /02-CD-AWS-lamda-sls: Permission denied``` - så må du huske å bytte ut <github bruker> med 
-ditt eget Github brukernavn. 
+Får du denne feilmeldingen ```bash: /02-CD-AWS-lamda-sls: Permission denied``` - så glemte du å bytte ut <github bruker> med 
+ditt eget Github brukernavn :-) 
 
 ![Alt text](img/clone.png  "a title")
 
@@ -69,7 +69,8 @@ antall sekunder på denne måten;
 git config --global credential.helper "cache --timeout=86400"
 ```
 
-Konfigurer også brukernavnet ditt
+Konfigurer også brukernavnet og eposten din for GitHub CLI. Da slipepr du advarsler i terminalen
+når du gjør commit senere.
 
 ````shell
 git config --global user.name <github brukernavn>
@@ -77,7 +78,7 @@ git config --global user.email <email for github bruker>
 
 ````
 
-## Test deployment fra Cloud 9
+## Test bygg og lokal utvikling fra Cloud 9 med SAM
 
 I cloud 9, åpne en Terminal
 
@@ -93,6 +94,7 @@ Du kan teste funksjonen uten å deploye den til AWS ved å kjøre kommandoen
 export UnleashToken=<Token gitt i klasserommet>
 sam local invoke -e event.json 
 ```
+
 Så lenge feature flagget MOCK er satt til "true" vil sentiment-analysen alltid returnere et positivt sentiment. 
 AWS Comprehend tjenesten vil bli brukt, når MOCK feature flagget er slått av. 
 
@@ -113,7 +115,7 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
 * NB! Du må endre Stack name til noe unikt. Legg på ditt brukeranvn eller noe i slutten av navnet, for eksempel; ```--stack-name sam-sentiment-ola```
 
 ```shell
- sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-gb3 --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=1234"
+ sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=1234"
 ```
 
 Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
@@ -131,11 +133,11 @@ effektivt sammen om denne funksjonen.
 
 ## GitHub Actions
 
-* For å få se filer som er "skjulte" i AWS Cloud9 må du velge "show hidden files" i fil-utforskeren.
+* NB! For å få se filer som er "skjulte" i AWS Cloud9 må du velge "show hidden files" i fil-utforskeren.
 ![Alt text](img/hiddenfiles.png  "a title")
 
 * Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende.
-* Du må endre parameter ````--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9-
+* Du må endre parameter ```--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9.
 
 ```yaml
 on:
@@ -190,9 +192,14 @@ Lag tre repository secrets, verdiene postes på Slack i klasserommet.
 
 ## Sjekk at pipeline virker
 
-* Gjør kode-endringer på main branch i lambda - koden, push. Se at pipeline deployer endringen din 
+* Gjør kode-endringer på main branch i lambda - koden, push. Se at pipeline deployer endringen din.
 
-* Test lambdafunksjonen med feks Curl (eller Postman om du har) 
+* Du vil se URL og andre opplysninger om Lambdaen i byggejobben i GitHub Actions
+
+![Alt text](img/finished.png  "a title")
+
+* Test lambdafunksjonen med feks Curl (eller Postman om du har)
+
 ```shell
 curl -X POST \
   <URL> \
@@ -201,7 +208,7 @@ curl -X POST \
   -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
 ```
 
-## Bonus utfordringer 
+## Bonusutfordringer 
 
 * Kan dere bruke en Egen Unleash konto og egen feature toggle? 
 * Repetisjon fra forrige øving; Klarer du å endre  workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection på ```main``` branch så vi ikke kan pushe direkte dit?.
