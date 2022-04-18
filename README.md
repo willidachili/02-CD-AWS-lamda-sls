@@ -1,17 +1,18 @@
-# Github Actions with Lambda, API Gateway and AWS SAM
+# GitHub actions, AWS Lambda med API Gateway og AWS SAM
 
-Demo av Github actions, og hvordan vi kan sette opp en CD pipeline for en AWS Lambdafunksjon. I denne laben skal vi bruke 
-AWS tjenesten "Comprehend" for å finne ut av om "stemningen" (Sentiment) i en tekst er negativt eller positivt 
-ladet. Dette kan for eksempel brukes til å finne ut av om et produkt får god eller dårlig omtale i medier osv. 
+I denne øvingen skal vi se på Github actions og hvordan vi kan sette opp en CD pipeline for en AWS Lambdafunksjon. 
+Vi skal bruke AWS tjenesten "Comprehend" for å finne "stemningen" (Sentiment) i en tekst- og om den er negativt eller positivt 
+ladet. 
 
-Vi skal også se på hvoordan vi kan bruke Feature toggles med Unleash for å slå av/på funkskjonalitet dynamisk 
+Vi skal også se på hvordan vi kan bruke "Feature toggles" med tjenesten Unleash for å slå av/på funkskjonalitet dynamisk 
 uten å gjøre nye deployments. 
 
-Vi skal også se på verktøyet "AWS SAM" for å 
+Deployment og bygg skal gjøres med verktøyet "AWS SAM", både i pipeline med GitHub actions, men også for fra et Cloud9
+miljø.
 
 ## Lag en fork
 
-Du må lage en fork av dette repositoryet til din egen GitHub konto.
+Du må start emd å lage en fork av dette repositoryet til din egen GitHub konto.
 
 ![Alt text](img/fork.png  "a title")
 
