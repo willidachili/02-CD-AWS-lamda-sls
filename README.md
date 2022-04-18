@@ -47,25 +47,23 @@ Access token må ha "repo" tillatelser, og "workflow" tillatelser.
 
 ### Lage en klone av din Fork (av dette repoet) inn i ditt Cloud 9 miljø
 
+Fra Terminal i Cloud 9. Klone repository med HTTPS URL. Eksempel ; 
+
+```
+git clone https://github.com/≤github bruker>/02-CD-AWS-lamda-sls
+```
+
+![Alt text](img/clone.png  "a title")
+
+OBS Når du gjør ```git push``` senere og du skal autentisere deg, skal du bruke GitHub Access token når du blir bedt om passord, 
+så du trenger å ta vare på dette et sted. 
+
 For å slippe å autentisere seg hele tiden kan man få git til å cache nøkler i et valgfritt
 antall sekunder på denne måten;
 
 ```shell
 git config --global credential.helper "cache --timeout=86400"
 ```
-
-OBS Når du gjør ```git push``` senere og du skal autentisere deg, skal du bruke GitHub Access token når du blir bedt om passord, 
-så du trenger å ta vare på dette et sted. 
-
-Klone repository med HTTPS URL
-
-![Alt text](img/clone.png  "a title")
-
-```
-git clone https://github.com/≤github bruker>/02-CD-AWS-lamda-sls
-```
-
-Her skal du bytte ut verdien "glennbech" med ditt eget navn, eller noe du tror vil være unikt blant de andre deltagerene i samme lab. 
 
 ## Test deployment fra Cloud 9
 
@@ -79,7 +77,8 @@ sam invoke local -e event.json
 ```
 
 Du skal få en respons omtrent som denne 
-```{"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": "{\"sentiment \": \"{\\\"Sentiment\\\": \\\"NEGATIVE\\\", \\\"SentimentScore\\\": {\\\"Positive\\\": 0.00023614335805177689, \\\"Negative\\\": 0.9974453449249268, \\\"Neutral\\\": 0.00039782875683158636, \\\"Mixed\\\": 0.0019206495489925146}, \\\"ResponseMetadata\\\": {\\\"RequestId\\\": \\\"c3367a61-ee05-4071-82d3-e3aed344f9af\\\", \\\"HTTPStatusCode\\\": 200, \\\"HTTPHeaders\\\": {\\\"x-amzn-requestid\\\": \\\"c3367a61-ee05-4071-82d3-e3aed344f9af\\\", \\\"content-type\\\": \\\"application/x-amz-json-1.1\\\", \\\"content-length\\\": \\\"168\\\", \\\"date\\\": \\\"Mon, 18 Apr 2022 12:00:06 GMT\\\"}, \\\"RetryAttempts\\\": 0}}\"}"}END RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0
+```
+{"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": "{\"sentiment \": \"{\\\"Sentiment\\\": \\\"NEGATIVE\\\", \\\"SentimentScore\\\": {\\\"Positive\\\": 0.00023614335805177689, \\\"Negative\\\": 0.9974453449249268, \\\"Neutral\\\": 0.00039782875683158636, \\\"Mixed\\\": 0.0019206495489925146}, \\\"ResponseMetadata\\\": {\\\"RequestId\\\": \\\"c3367a61-ee05-4071-82d3-e3aed344f9af\\\", \\\"HTTPStatusCode\\\": 200, \\\"HTTPHeaders\\\": {\\\"x-amzn-requestid\\\": \\\"c3367a61-ee05-4071-82d3-e3aed344f9af\\\", \\\"content-type\\\": \\\"application/x-amz-json-1.1\\\", \\\"content-length\\\": \\\"168\\\", \\\"date\\\": \\\"Mon, 18 Apr 2022 12:00:06 GMT\\\"}, \\\"RetryAttempts\\\": 0}}\"}"}END RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0
 REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  Duration: 1674.95 ms    Billed Duration: 1675 ms        Memory Size: 128 MB     Max Memory Used: 128 MB
 ```
 
@@ -88,29 +87,30 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
 
 ## Deploy med SAM fra Cloud 9
 
-Du kan også bruke SAM til å deploye lambdafunksjonen rett fra Cloud9 miljøet 
+* Du kan også bruke SAM til å deploye lambdafunksjonen rett fra Cloud 9 
+* NB! Du må endre Stack name til noe unikt. Legg på ditt brukeranvn eller noe i slutten av navnet, for eksempel; ```--stack-name sam-sentiment-ola```
 
 ```shell
-sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-glennbech2 --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
+ sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=1234"
 ```
 
-Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten 
+Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
 
 ```shell
 curl -X POST \
-  <din URL her> \
+  <URL> \
   -H 'Content-Type: text/plain' \
   -H 'cache-control: no-cache' \
   -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
 ```
 
-Men, dette er jo ikke veldig "DevOps" og vil ikke fungere i et større team. Vi trenger både CI og CD for å kunne jobbe 
+Men... dette er jo ikke veldig "DevOps" og vil ikke fungere i et større team. Vi trenger både CI og CD for å kunne jobbe 
 effektivt sammen om denne funksjonen.
 
 ## GitHub Actions
 
 * Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende.
-* Du må endre parameter ````stack name``` til ```sam deploy``` kommandoen. 
+* Du må endre parameter ````--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9-
 
 ```yaml
 on:
