@@ -24,6 +24,17 @@ Du må lage en fork av dette repositoryet til din egen GitHub konto.
 * Velg "Open IDE" 
 * Hvis du ikke ser ditt miljø, kan det hende du har valgt feil region. Hvilken region du skal bruke vil bli oppgitt i klasserommet.
 
+## Rydde plass
+
+Det er bare 10GB med data på den virtuelle serveren Cloud9 miljøet er startet på, så du må slette et par docker images for å rydde
+pass 
+
+```shell
+ docker image rm lambci/lambda:nodejs10.x
+ docker image rm lambci/lambda:nodejs12.x
+ docker image rm lambci/lambda:python2.7
+```
+
 ### Lag et Access Token for GitHub
 
 Når du skal autentisere deg mot din GitHub konto fra Cloud 9 trenger du et access token.  Gå til  https://github.com/settings/tokens og lag et nytt.
@@ -54,18 +65,6 @@ Klone repository med HTTPS URL
 git clone https://github.com/≤github bruker>/02-CD-AWS-lamda-sls
 ```
 
-## Endre på koden for å unngå navnekonflikter
-
-Siden alle studentene deler en AWS konto, er det viktig at alle ressurser som lages    
-I template.yml - se etter koden 
-
-```shell
-  Prefix:
-    Description: Change this to avoid naming conflicts 
-    Type: String
-    Default: glennbech
-```
-
 Her skal du bytte ut verdien "glennbech" med ditt eget navn, eller noe du tror vil være unikt blant de andre deltagerene i samme lab. 
 
 ## Test deployment fra Cloud 9
@@ -73,20 +72,26 @@ Her skal du bytte ut verdien "glennbech" med ditt eget navn, eller noe du tror v
 I cloud 9, åpne en Terminal
 
 ```shell
-cd <katalognanvn>
+cd 02-CD-AWS-lamda-sls
+cd sentiment-demo/
 sam build --use-container
 sam invoke local -e event.json 
 ```
 
-* Ta en ekstra kikk på event.json. Dette er objektet AWS Lambda får av tjenesten API Gateway .
-* Du kan gjerne forsøke å endre teksten i event.json for å få en posirive review
+Du skal få en respons omtrent som denne 
+```{"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": "{\"sentiment \": \"{\\\"Sentiment\\\": \\\"NEGATIVE\\\", \\\"SentimentScore\\\": {\\\"Positive\\\": 0.00023614335805177689, \\\"Negative\\\": 0.9974453449249268, \\\"Neutral\\\": 0.00039782875683158636, \\\"Mixed\\\": 0.0019206495489925146}, \\\"ResponseMetadata\\\": {\\\"RequestId\\\": \\\"c3367a61-ee05-4071-82d3-e3aed344f9af\\\", \\\"HTTPStatusCode\\\": 200, \\\"HTTPHeaders\\\": {\\\"x-amzn-requestid\\\": \\\"c3367a61-ee05-4071-82d3-e3aed344f9af\\\", \\\"content-type\\\": \\\"application/x-amz-json-1.1\\\", \\\"content-length\\\": \\\"168\\\", \\\"date\\\": \\\"Mon, 18 Apr 2022 12:00:06 GMT\\\"}, \\\"RetryAttempts\\\": 0}}\"}"}END RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0
+REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  Duration: 1674.95 ms    Billed Duration: 1675 ms        Memory Size: 128 MB     Max Memory Used: 128 MB
+```
 
-## Deploy med SAM fra Cloid 9
+* Ta en ekstra kikk på event.json. Dette er objektet AWS Lambda får av tjenesten API Gateway .
+* Forsøke å endre teksten i "Body" delen av event.json - klarer å å endre sentimentet til positivt ?
+
+## Deploy med SAM fra Cloud 9
 
 Du kan også bruke SAM til å deploye lambdafunksjonen rett fra Cloud9 miljøet 
 
 ```shell
-sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<bruker> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
+sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-glennbech2 --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
 ```
 
 Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten 
@@ -104,7 +109,8 @@ effektivt sammen om denne funksjonen.
 
 ## GitHub Actions
 
-Kopier  denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende 
+* Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende.
+* Du må endre parameter ````stack name``` til ```sam deploy``` kommandoen. 
 
 ```yaml
 on:
@@ -129,9 +135,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: sam build --use-container
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
-```
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=${{ secrets.UNLEASH_TOKEN }}"
+ ```
+
+## Hemmeligheter
+
+Vi skal _absolutt ikke_ sjekke inn API nøkler og hemmeligheter inn i koden. GitHub har heldigvis en mekanisme for å lagre hemmeligheter utenfor koden. 
+Repository settings og under menyvalget "secrets" kan vi legge inn verdier og bruke de fra workflowene våre ved å referere de ved navn for eksempel på denne måten
+``` aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}```
+
+## Sjekk at pipeline virker
+
+* Gjør kode-endringer på main branch i lambda - koden, push. Se at pipeline deployer endringen din 
+* Repetisjon fra tidligere; Endre workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection op main så vi ikke kan pushe direkte til den brnachen.
 
 ## Bonus-utfordring 
-
+Kan dere bruke en Egen Unleash konto og egen feature toggle? 
 Se om dere kan bruke andre 
