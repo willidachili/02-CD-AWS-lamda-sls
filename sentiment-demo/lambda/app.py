@@ -15,6 +15,7 @@ def handler(event, context):
         custom_headers={'Authorization': os.environ['UnleashToken']})
 
     unleash_client.initialize_client()
+
     client = boto3.client('comprehend')
 
 ## Process sentiment analysis onlyif the MOCK toggle is ON. Mock returns very Positive sentiment just in case
