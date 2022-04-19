@@ -39,6 +39,15 @@ pass
  docker image rm lambci/lambda:python2.7
 ```
 
+Hvis dere får feil på sam build, kjør 
+
+```python
+docker images
+```
+og slett alle bortsett fra Python3.8
+
+
+
 ### Lag et Access Token for GitHub
 
 Når du skal autentisere deg mot din GitHub konto fra Cloud 9 trenger du et access token.  Gå til  https://github.com/settings/tokens og lag et nytt.
