@@ -50,7 +50,8 @@ og slett alle bortsett fra Python3.8
 
 ### Lag et Access Token for GitHub
 
-Når du skal autentisere deg mot din GitHub konto fra Cloud 9 trenger du et access token.  Gå til  https://github.com/settings/tokens og lag et nytt.
+* Når du skal autentisere deg mot din GitHub konto fra Cloud 9 trenger du et access token.  Gå til  https://github.com/settings/tokens og lag et nytt.
+* NB. Ta vare på tokenet et sted, du trenger dette senere når du skal gjøre ```git push```
 
 ![Alt text](img/generate.png  "a title")
 
@@ -146,6 +147,7 @@ effektivt sammen om denne funksjonen.
 ## GitHub Actions
 
 * NB! For å få se filer som er "skjulte" i AWS Cloud9 må du velge "show hidden files" i fil-utforskeren.
+  (trykk på "tannhjulet")
 ![Alt text](img/hiddenfiles.png  "a title")
 
 * Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende.
@@ -208,6 +210,7 @@ Lag tre repository secrets, verdiene postes på Slack i klasserommet.
 * Commit & push endringen
 * Se at endringene blir deployet av GitHub Actions workflow.
 * Når jobben er ferdig, vil du se URL og andre opplysninger om Lambdaen i byggejobben i GitHub Actions.
+* NB. Hvis du ikke gjør noen endring i koden, får du ikke en ny deployment av Lambda, og du vil ikke se URL og andre opplysninger i vinduet under; gjør en enkel kodeendring og push! Da ser du URL mm. Evt vil du kunne finne URL til tjenesten din fra første gang du gjorde ```sam deploy``` i steget over.
 
 ![Alt text](img/finished.png  "a title")
 
