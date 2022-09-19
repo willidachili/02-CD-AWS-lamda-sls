@@ -4,12 +4,6 @@
 Vi skal bruke AWS tjenesten "Comprehend" for å finne "stemningen" (Sentiment) i en tekst- og om den er negativt eller positivt 
 ladet. 
 
-* Vi skal også se på hvordan vi kan bruke "Feature toggles" med tjenesten Unleash for å slå av/på funkskjonalitet dynamisk 
-uten å gjøre nye deployments. 
-
-* NB! I denne øvingen er det URL til instruktøren sitt miljø i Unleash som er hardkodet inn i filen  ```app.py``` - Unleash sin  
-brukerregistrering er ikke helt synkron, så det kan ta timer(!) fra du registrerer deg til miljøet ditt er klart. I en lab/øving har vi ikke tid til å vente på dette. 
-
 * Deployment og bygg skal gjøres med verktøyet "AWS SAM", både i pipeline med GitHub actions, men også for fra et Cloud9
 miljø.
 
@@ -27,26 +21,6 @@ Du må start emd å lage en fork av dette repositoryet til din egen GitHub konto
 * Gå til tjenesten Cloud9 (Du nå søke på Cloud9 uten mellomrom i søket) 
 * Velg "Open IDE" 
 * Hvis du ikke ser ditt miljø, kan det hende du har valgt feil region. Hvilken region du skal bruke vil bli oppgitt i klasserommet.
-
-## Rydde plass
-
-Det er bare 10GB med data på den virtuelle serveren Cloud9 miljøet er startet på, så du må slette et par docker images for å rydde
-pass 
-
-```shell
- docker image rm lambci/lambda:nodejs10.x
- docker image rm lambci/lambda:nodejs12.x
- docker image rm lambci/lambda:python2.7
-```
-
-Hvis dere får feil på sam build, kjør 
-
-```python
-docker images
-```
-og slett alle bortsett fra Python3.8
-
-
 
 ### Lag et Access Token for GitHub
 
@@ -76,7 +50,7 @@ OBS Når du gjør ```git push``` senere og du skal autentisere deg, skal du bruk
 så du trenger å ta vare på dette et sted. 
 
 For å slippe å autentisere seg hele tiden kan man få git til å cache nøkler i et valgfritt
-antall sekunder på denne måten;
+antall sekunder på denne måten.
 
 ```shell
 git config --global credential.helper "cache --timeout=86400"
@@ -104,7 +78,6 @@ sam build --use-container
 Du kan teste funksjonen uten å deploye den til AWS ved å kjøre kommandoen 
 
 ```shell
-export UnleashToken=<Token gitt i klasserommet>
 sam local invoke -e event.json 
 ```
 
@@ -122,17 +95,16 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
 * Ta en ekstra kikk på event.json. Dette er objektet AWS Lambda får av tjenesten API Gateway .
 * Forsøke å endre teksten i "Body" delen av event.json - klarer å å endre sentimentet til positivt ?
 
-## Deploy med SAM fra Cloud 9
+## Deploy med SAM fra Cloud 9 (Valgffritt)
 
 * Du kan også bruke SAM til å deploye lambdafunksjonen rett fra Cloud 9 
 * NB! Du må endre Stack name til noe unikt. Legg på ditt brukeranvn eller noe i slutten av navnet, for eksempel; ```--stack-name sam-sentiment-ola```
 
 ```shell
- sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=1234"
+ sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides
 ```
 
 Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
-
 ```shell
 curl -X POST \
   <URL> \
@@ -145,6 +117,9 @@ Men... dette er jo ikke veldig "DevOps" og vil ikke fungere i et større team. V
 effektivt sammen om denne funksjonen.
 
 ## GitHub Actions
+
+Vi skal nå lage en workflow eller pipeline som ved hver eneste commit til main branch i github bygger og deployer 
+en ny version av lambdafunksjonen.
 
 * NB! For å få se filer som er "skjulte" i AWS Cloud9 må du velge "show hidden files" i fil-utforskeren.
   (trykk på "tannhjulet")
@@ -176,11 +151,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: sam build --use-container
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<your name or something> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=${{ secrets.UNLEASH_TOKEN }}"
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<your name or something unique> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=${{ secrets.UNLEASH_TOKEN }}"
  ```
 
 For å pushe endringen til ditt repo må du stå i riktig katalog i Cloud9 terminalen 
-
 ```bash
 cd ~/environment/02-CD-AWS-lamda-sls
 git add .github/
@@ -223,19 +197,6 @@ curl -X POST \
   -H 'cache-control: no-cache' \
   -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
 ```
-## Bonusutfordringer 
 
-* Kan dere bruke en Egen Unleash konto og egen feature toggle? 
 
-Hint. Se i ```app.py```. URL er unik for prosjektet i Unleash, og vil ha en annen verdi for deg om du har en 
-egen Unleash bruker. 
-
-````python
-unleash_client = UnleashClient(
-    url="https://eu.app.unleash-hosted.com/eubb1043/api",
-    app_name="sentiment",
-    cache_directory="/tmp/",
-    custom_headers={'Authorization': os.environ['UnleashToken']})
-````
-
-* Repetisjon fra forrige øving; Klarer du å endre  workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection på ```main``` branch så vi ikke kan pushe direkte dit?.
+* Repetisjon fra forrige øving; Klarer du å endre  workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection på ```main``` branch så vi ikke kan pushe direkte dit?
