@@ -7,9 +7,18 @@ ladet.
 * Deployment og bygg skal gjøres med verktøyet "AWS SAM", både i pipeline med GitHub actions, men også for fra et Cloud9
 miljø.
 
+## Beskrivelse 
+
+Denne øvingen bruker fire AWS tjenestester 
+
+* AWS LAMBDA - Serverless Compute. Tjenesten kjører en enkelt funksjon og avslutter. Du Betaler for antall millisekunder koden kjører. Du velger språk
+* API GATEWAY - Gir AWS Lambda et HTTP grensesnitt ut mot verden.Støtter autentisering, caching, throttling osv.
+* AWS SAM - CLI for å lage,deploye og vedlikeholde applikasjoner basert på Serverless teknologi
+* API COMPREHEND- AWS tjeneste for tekstanalyse. Kan finne ut av om sentimentet eller “stemningen” i en tekst er god eller dårlig.
+
 ## Lag en fork
 
-Du må start emd å lage en fork av dette repositoryet til din egen GitHub konto.
+Du må start emd å lage en fork av dette repoet til din egen GitHub konto.
 
 ![Alt text](img/fork.png  "a title")
 
@@ -17,7 +26,8 @@ Du må start emd å lage en fork av dette repositoryet til din egen GitHub konto
 
 ![Alt text](img/aws_login.png  "a title")
 
-* Logg på med din AWS bruker med URL, brukernavn og passord gitt i klassrommet
+* URL for innlogging er https://244530008913.signin.aws.amazon.com/console
+* Logg på med brukernavn og passord gitt i klassrommet
 * Gå til tjenesten Cloud9 (Du nå søke på Cloud9 uten mellomrom i søket) 
 * Velg "Open IDE" 
 * Hvis du ikke ser ditt miljø, kan det hende du har valgt feil region. Hvilken region du skal bruke vil bli oppgitt i klasserommet.
@@ -49,9 +59,10 @@ ditt eget Github brukernavn :-)
 OBS Når du gjør ```git push``` senere og du skal autentisere deg, skal du bruke GitHub Access token når du blir bedt om passord, 
 så du trenger å ta vare på dette et sted. 
 
-For å slippe å autentisere seg hele tiden kan man få git til å cache nøkler i et valgfritt
-antall sekunder på denne måten.
-
+## Konfigurer Git i Cloud9 
+Følgende steg trenger du bare gjøre en gang i Cloud9 miljøet ditt. Du kan hoppe over hele steget hvis du har gjort det tidligere. 
+For å slippe å autentisere seg hele tiden kan man få git til å cache nøkler i et valgfritt antall sekunder på denne måten.
+ 
 ```shell
 git config --global credential.helper "cache --timeout=86400"
 ```
@@ -104,7 +115,7 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
  sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides
 ```
 
-Du kan deretter bruke for eksempel postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
+Du kan deretter bruke postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
 ```shell
 curl -X POST \
   <URL> \
@@ -166,6 +177,8 @@ På git push blir du bedt om brukernavn og passord. Bruk brukernavnet ditt, og A
 
 ## Hemmeligheter
 
+GitHub actions trenger våre API nøkler for å kunne deploye kode i AWS på våre vegne. 
+
 ![Alt text](img/topsecret.png  "a title")
 
 Vi skal _absolutt ikke_ sjekke inn API nøkler og hemmeligheter inn i koden. GitHub har heldigvis en mekanisme for å lagre hemmeligheter utenfor koden. 
@@ -176,7 +189,6 @@ Lag tre repository secrets, verdiene postes på Slack i klasserommet.
 
 * AWS_ACCESS_KEY_ID 
 * AWS_SECRET_ACCESS_KEY
-* UNLEASH_TOKEN 
 
 ## Sjekk at pipeline virker
 
@@ -198,5 +210,3 @@ curl -X POST \
   -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
 ```
 
-
-* Repetisjon fra forrige øving; Klarer du å endre  workflowen til å kjøre på Pull requester mot main, og konfigurere branch protection på ```main``` branch så vi ikke kan pushe direkte dit?
