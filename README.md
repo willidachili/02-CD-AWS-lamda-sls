@@ -213,12 +213,11 @@ Lag to repository secrets.
 * Gjør kodeendringer på main branch i Lambdaen
 * Commit & push endringen
 * Se at endringene blir deployet av GitHub Actions workflow.
-* NB. Hvis du ikke gjør noen endring i koden, får du ikke en ny deployment av Lambda, og du vil ikke se URL og andre opplysninger i vinduet under; gjør en enkel kodeendring og push! Da ser du URL mm. Evt vil du kunne finne URL til tjenesten din fra første gang du gjorde ```sam deploy``` i steget over.
+* NB. Hvis du ikke gjør noen endring i koden, får du ikke en ny deployment av Lambda.
 
 ![Alt text](img/finished.png  "a title")
 
-* Test lambdafunksjonen med feks Curl (eller Postman om du har)
-
+* Test lambdafunksjonen med feks Curl (eller Postman om du har) 
 ```shell
 curl -X POST $URL -H 'Content-Type: text/plain' -H 'cache-control: no-cache' -d 'The laptop would not boot up'
 ```
