@@ -115,7 +115,10 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
  sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
 ```
 
-Når jobben er ferdig, vil du se blant annet se hva URL'en til lambdafunksjonen er for eksempel; 
+* Legg merke til at regionen er satt til us-east-1 (N.Virigina) vi jobber med Cloud9 i Irland, men deployer funksjonen vår til AWS Sin ifrastruktur i USA. Kult?! 
+
+Når jobben er ferdig, vil du blant annet se hva URL'en til lambdafunksjonen ble. Let etter output som ser slikt ut; 
+
 ```text
 Key                 SentimentAPI                                                                
 Description         API Gateway endpoint URL for Prod stage for Sentiment function              
@@ -126,7 +129,7 @@ Du kan deretter bruke postman eller Curl til å teste ut tjenesten. Erstat URL m
 etter dete har gjort deploy 
 
 ```shell
-export URL=<URL gitt ved deploy>
+export URL=<URL du fikk vite ved deploy>
 curl -X POST $URL -H 'Content-Type: text/plain'  -H 'cache-control: no-cache' -d 'The laptop would not boot up when I got it.'
 ```
 
@@ -144,7 +147,7 @@ en ny version av lambdafunksjonen.
 ![Alt text](img/hiddenfiles.png  "a title")
 
 * Lag en ny mappe i rotkatalogen til repositoriet du klonet som heter .github/workflows
-* Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende. Du må endre parameter ```--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9.
+* Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende. Du må endre parameter ```--stack-name``` i  ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9.
 
 ```yaml
 on:
@@ -192,7 +195,7 @@ Vi skal _absolutt ikke_ sjekke inn API nøkler og hemmeligheter inn i koden. Git
 Repository settings og under menyvalget "secrets" kan vi legge inn verdier og bruke de fra workflowene våre ved å referere de ved navn for eksempel på denne måten
 ``` aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}```
 
-Lag tre repository secrets, verdiene postes på Slack i klasserommet. 
+Lag to repository secrets, verdiene postes på Slack i klasserommet. 
 
 * AWS_ACCESS_KEY_ID 
 * AWS_SECRET_ACCESS_KEY
