@@ -192,7 +192,7 @@ GitHub actions trenger våre API nøkler for å kunne deploye kode i AWS på vå
 ![Alt text](img/topsecret.png  "a title")
 
 Vi skal _absolutt ikke_ sjekke inn API nøkler og hemmeligheter inn i koden. GitHub har heldigvis en mekanisme for å lagre hemmeligheter utenfor koden. 
-Repository settings og under menyvalget "secrets" kan vi legge inn verdier og bruke de fra workflowene våre ved å referere de ved navn for eksempel på denne måten
+* I Repository settings og under menyvalget "secrets" og "Action secrets"  kan vi legge inn verdier og bruke de fra workflowene våre ved å referere de ved navn for eksempel på denne måten
 ``` aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}```
 
 Lag to repository secrets, verdiene postes på Slack i klasserommet. 
