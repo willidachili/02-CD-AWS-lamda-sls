@@ -195,10 +195,13 @@ Vi skal _absolutt ikke_ sjekke inn API nøkler og hemmeligheter inn i koden. Git
 * I Repository settings og under menyvalget "secrets" og "Action secrets"  kan vi legge inn verdier og bruke de fra workflowene våre ved å referere de ved navn for eksempel på denne måten
 ``` aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}```
 
-Lag to repository secrets, verdiene postes på Slack i klasserommet. 
+Lag to repository secrets. 
 
 * AWS_ACCESS_KEY_ID 
 * AWS_SECRET_ACCESS_KEY
+
+* Du må gå til tjenesten IAM i AWS og fine din egen IAM bruker. 
+* Du må lage nye "credentials" for AWS brukeren for å få verdier du kan bruke i hemmelighetene. 
 
 ## Sjekk at pipeline virker
 
