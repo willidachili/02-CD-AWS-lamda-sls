@@ -12,13 +12,13 @@ miljø.
 Denne øvingen bruker fire AWS tjenestester 
 
 * AWS LAMBDA - Serverless Compute. Tjenesten kjører en enkelt funksjon og avslutter. Du Betaler for antall millisekunder koden kjører. Du velger språk
-* API GATEWAY - Gir AWS Lambda et HTTP grensesnitt ut mot verden.Støtter autentisering, caching, throttling osv.
-* AWS SAM - CLI for å lage,deploye og vedlikeholde applikasjoner basert på Serverless teknologi
+* API GATEWAY - Gir AWS Lambda et HTTP grensesnitt ut mot verden.Støtter autentisering, caching, throttling, rate limiting osv.
+* AWS SAM - Verktøy for å lage,deploye og vedlikeholde applikasjoner basert på Serverless teknologi
 * API COMPREHEND- AWS tjeneste for tekstanalyse. Kan finne ut av om sentimentet eller “stemningen” i en tekst er god eller dårlig.
 
 ## Lag en fork
 
-Du må start emd å lage en fork av dette repoet til din egen GitHub konto.
+Du må start med å lage en fork av dette repoet til din egen GitHub konto.
 
 ![Alt text](img/fork.png  "a title")
 
@@ -106,22 +106,28 @@ REPORT RequestId: d37e4849-b175-4fa6-aa4b-0031af6f41a0  Init Duration: 0.42 ms  
 * Ta en ekstra kikk på event.json. Dette er objektet AWS Lambda får av tjenesten API Gateway .
 * Forsøke å endre teksten i "Body" delen av event.json - klarer å å endre sentimentet til positivt ?
 
-## Deploy med SAM fra Cloud 9 (Valgffritt)
+## Deploy med SAM fra Cloud 9
 
 * Du kan også bruke SAM til å deploye lambdafunksjonen rett fra Cloud 9 
 * NB! Du må endre Stack name til noe unikt. Legg på ditt brukeranvn eller noe i slutten av navnet, for eksempel; ```--stack-name sam-sentiment-ola```
 
 ```shell
- sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides
+ sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<noe unikt, feks brukernavnet ditt i AWS kontoen> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
 ```
 
-Du kan deretter bruke postman eller Curl til å teste ut tjenesten. <URL> får dere etter SAM deploy. 
+Når jobben er ferdig, vil du se blant annet se hva URL'en til lambdafunksjonen er for eksempel; 
+```text
+Key                 SentimentAPI                                                                
+Description         API Gateway endpoint URL for Prod stage for Sentiment function              
+Value               https://orpbuzoiik.execute-api.us-east-1.amazonaws.com/Prod/sentiment/      
+```
+
+Du kan deretter bruke postman eller Curl til å teste ut tjenesten. Erstat URL med URL'en til lambdafunksjonen. Dere finner denne
+etter dete har gjort deploy 
+
 ```shell
-curl -X POST \
-  <URL> \
-  -H 'Content-Type: text/plain' \
-  -H 'cache-control: no-cache' \
-  -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
+export URL=<URL gitt ved deploy>
+curl -X POST $URL -H 'Content-Type: text/plain'  -H 'cache-control: no-cache' -d 'The laptop would not boot up when I got it.'
 ```
 
 Men... dette er jo ikke veldig "DevOps" og vil ikke fungere i et større team. Vi trenger både CI og CD for å kunne jobbe 
@@ -134,10 +140,11 @@ en ny version av lambdafunksjonen.
 
 * NB! For å få se filer som er "skjulte" i AWS Cloud9 må du velge "show hidden files" i fil-utforskeren.
   (trykk på "tannhjulet")
+* 
 ![Alt text](img/hiddenfiles.png  "a title")
 
-* Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende.
-* Du må endre parameter ```--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9.
+* Lag en ny mappe i rotkatalogen til repositoriet du klonet som heter .github/workflows
+* Kopier denne koden inn i  ```.github/workflows/``` katalogen, og kall den for eksempel sam-deploy.yml eller noe tilsvarende. Du må endre parameter ```--stack-name``` til ```sam deploy``` kommandoen. Bruk samme stack navn som du brukte når du deployet direkte fra cloud 9.
 
 ```yaml
 on:
@@ -162,8 +169,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: sam build --use-container
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-<your name or something unique> --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1  --parameter-overrides "ParameterKey=UnleashToken,ParameterValue=${{ secrets.UNLEASH_TOKEN }}"
- ```
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-sam_and_glenn --s3-bucket lambda-deployments-gb --capabilities CAPABILITY_IAM --region us-east-1
+```
 
 For å pushe endringen til ditt repo må du stå i riktig katalog i Cloud9 terminalen 
 ```bash
@@ -192,10 +199,14 @@ Lag tre repository secrets, verdiene postes på Slack i klasserommet.
 
 ## Sjekk at pipeline virker
 
+* før du kan teste pipeline må du slå på "Actions" for din fork.
+* Gå til "actions" i ditt repository i GitHub 
+
+![Alt text](img/enable_actions.png "a title")
+
 * Gjør kodeendringer på main branch i Lambdaen
 * Commit & push endringen
 * Se at endringene blir deployet av GitHub Actions workflow.
-* Når jobben er ferdig, vil du se URL og andre opplysninger om Lambdaen i byggejobben i GitHub Actions.
 * NB. Hvis du ikke gjør noen endring i koden, får du ikke en ny deployment av Lambda, og du vil ikke se URL og andre opplysninger i vinduet under; gjør en enkel kodeendring og push! Da ser du URL mm. Evt vil du kunne finne URL til tjenesten din fra første gang du gjorde ```sam deploy``` i steget over.
 
 ![Alt text](img/finished.png  "a title")
@@ -203,10 +214,6 @@ Lag tre repository secrets, verdiene postes på Slack i klasserommet.
 * Test lambdafunksjonen med feks Curl (eller Postman om du har)
 
 ```shell
-curl -X POST \
-  <URL> \
-  -H 'Content-Type: text/plain' \
-  -H 'cache-control: no-cache' \
-  -d 'The laptop would not boot up when I got it. It would let me get through a few steps of the setup process, then it would become unresponsive and eventually shut down, then restar, '
+curl -X POST $URL -H 'Content-Type: text/plain' -H 'cache-control: no-cache' -d 'The laptop would not boot up'
 ```
 
